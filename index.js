@@ -4,6 +4,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
 const path = require('path');
+const { restoreDefaultPrompts } = require('inquirer');
 let choice;
 
 // Set up express.
@@ -20,7 +21,6 @@ app.use(express.urlencoded({ extended: false }));
 // Parse request body as JSON.
 app.use(express.json());
 app.use(express.static('public'));
-
 
 // Connect to database
 const db = mysql.createConnection(
@@ -55,7 +55,8 @@ app.get('/', (req, res) => res.send('Main'));
   
 function init() {
 
-    console.log('\n----- Welcome to Employee Tracker! -----');
+    console.log('\n');
+    console.log('----- Welcome to Employee Tracker! -----');
 
     // Call main menu function.
     mainMenu();
@@ -63,6 +64,8 @@ function init() {
 }
 
 const mainMenu = () => {
+
+    console.log('\n');
 
     // Present main menu options.
     inquirer
@@ -78,12 +81,52 @@ const mainMenu = () => {
         .then((answers) => {
 
             choice = answers.task[0];
-            console.log(choice);
+            // console.log(choice);
 
-            if (answers.task[0])
+            if (choice == 1) {
+                db.query('SELECT * FROM department', function (err, results) {
+                   // console.log(results);
+                   console.table(results);
+                   keepGoing();
+                });
+            };
+            if (choice == 2) {
+                db.query('SELECT * FROM role', function (err, results) {
+                   // console.log(results);
+                   console.table(results);
+                   keepGoing();
+                });
+            };
+            if (choice == 3) {
+                db.query('SELECT * FROM employee', function (err, results) {
+                   // console.log(results);
+                   console.table(results);
+                   keepGoing();
+                });
+            };
 
         });
+
     return;
+    
+};
+
+function keepGoing() {
+
+    inquirer
+        .prompt([
+        {
+            type: 'confirm',
+            name: 'anotherChoice',
+            prefix: '-',
+            message: 'Would you like to perform another task?',
+        },
+        ])
+        .then((answer) => {
+            if (answer.anotherChoice) mainMenu();
+            else console.log('\nGoodbye.');
+        });
+
 }
 
 // Initialize on application launch.
