@@ -36,7 +36,7 @@ const db = mysql.createConnection(
         database: 'staff_db'
     },
 
-    console.log(`\n----- Connected to the movies_db database. -----`)
+    console.log(`\n----- Now connected to the staff_db database. -----`)
 );
   
 app.get('/', (req, res) => res.send('Main'));
@@ -117,14 +117,14 @@ function keepGoing() {
         .prompt([
         {
             type: 'confirm',
-            name: 'anotherChoice',
+            name: 'goAgain',
             prefix: '-',
             message: 'Would you like to perform another task?',
         },
         ])
         .then((answer) => {
-            if (answer.anotherChoice) mainMenu();
-            else console.log('\nGoodbye.');
+            if (answer.goAgain) mainMenu();
+            else console.log('\n----- Thanks for using Employee Tracker. Goodbye!');
         });
 
 }

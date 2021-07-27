@@ -1,11 +1,10 @@
--- SELECT
---   favorite_books.book_name AS name, book_prices.price AS price
--- FROM favorite_books
--- JOIN book_prices ON favorite_books.book_price = book_prices.id;
-
 SELECT *
     FROM employee 
     JOIN role ON employee.role_id = role.title;
 
 SELECT *
     FROM employee; 
+
+SELECT *
+    FROM role
+    JOIN department ON role.department_id = department.name;
