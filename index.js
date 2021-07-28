@@ -103,7 +103,7 @@ const mainMenu = () => {
 
             // View All Employees.
             if (choice == 3) {
-                db.query('SELECT * FROM employee', function (err, results) {
+                db.query('SELECT employee.id AS ID, employee.first_name AS FirstName, employee.last_name AS LastName, role.title AS Title, department.name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id', function (err, results) {
                    // console.log(results);
                    console.table(results);
                    keepGoing();
