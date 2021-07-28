@@ -81,22 +81,27 @@ const mainMenu = () => {
         .then((answers) => {
 
             choice = answers.task[0];
-            // console.log(choice);
+            console.log('\n');
 
+            // View All Departments.
             if (choice == 1) {
-                db.query('SELECT * FROM department', function (err, results) {
+                db.query('SELECT id AS ID, name AS Department FROM department', function (err, results) {
                    // console.log(results);
                    console.table(results);
                    keepGoing();
                 });
             };
+
+            // View All Roles.
             if (choice == 2) {
-                db.query('SELECT * FROM role', function (err, results) {
+                db.query('SELECT role.title AS Title, role.id AS ID, department.name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id', function (err, results) {
                    // console.log(results);
                    console.table(results);
                    keepGoing();
                 });
             };
+
+            // View All Employees.
             if (choice == 3) {
                 db.query('SELECT * FROM employee', function (err, results) {
                    // console.log(results);

@@ -1,7 +1,7 @@
 USE staff_db;
 
 INSERT INTO department (name)
-VALUES  ('Management'),
+VALUES  ('Administration'),
         ('Computed Tomography'),
         ('MRI');
 
