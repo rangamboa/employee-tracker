@@ -1,26 +1,10 @@
-// The app requires these packages to be installed.
-// const express = require('express');
+// The app needs these packages:
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-// const path = require('path');
-const { restoreDefaultPrompts } = require('inquirer');
+
+// const { restoreDefaultPrompts } = require('inquirer');
 let choice;
-
-// Set up express.
-// const PORT = process.env.PORT || 3001;
-// const app = express();
-
-// app.listen(PORT, () =>
-//     console.log(`\n----- Listening at http://localhost:${PORT}`)
-// );
-
-// Express middleware
-// app.use(express.urlencoded({ extended: false }));
-
-// Parse request body as JSON.
-// app.use(express.json());
-// app.use(express.static('public'));
 
 // Connect to database
 const db = mysql.createConnection(
@@ -31,16 +15,13 @@ const db = mysql.createConnection(
         user: 'root',
   
         // MySQL password
-
         password: 'password',
         database: 'staff_db'
     },
 
     console.log(`\n----- Now connected to the staff_db database. -----`)
 );
-  
-// app.get('/', (req, res) => res.send('Main'));
-  
+
 function init() {
 
     console.log('\n');
@@ -48,7 +29,6 @@ function init() {
 
     // Call main menu function.
     mainMenu();
-
 }
 
 const viewDepts = () => {
@@ -162,7 +142,7 @@ const addRole = () => {
 }
 
 const addEmp = () => {
-
+    
     inquirer
     .prompt([
     {
@@ -187,13 +167,58 @@ const addEmp = () => {
         type: 'number',
         name: 'newMgr',
         prefix: '-',
-        message: 'Enter the manager ID number of the new employee.',
+        message: 'Enter the manager ID of the new employee.',
     },
     ])
     .then((answer) => {
 
-        // Create query as a string that includes new role information.
+        // Create query as a string that includes new employee information.
         thisQuery = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("' + answer.newFirst + '", "' + answer.newLast + '", ' + answer.newRole + ', ' + answer.newMgr + ')';
+
+        //console.log(thisQuery);
+
+        // Add new employee to table.
+        db.query(thisQuery, (err, results) => {
+            if (err) {
+                console.log(err);
+                db.end();
+            } else {
+                //Display all roles.
+                viewEmps();
+            }
+         });
+    });
+}
+const updateEmp = () => {
+    
+    db.query('SELECT employee.id AS ID, employee.first_name AS FirstName, employee.last_name AS LastName, role.title AS Title, department.name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id', (err, results) => {
+        if (err) {
+            console.log(err);
+            db.end();
+        } else {
+            console.table(results);
+        }
+    });
+
+    inquirer
+    .prompt([
+    {
+        type: 'number',
+        name: 'updateID',
+        prefix: '-',
+        message: 'Enter the ID of employee to be updated.',
+    },
+    {
+        type: 'number',
+        name: 'updatedRole',
+        prefix: '-',
+        message: 'Enter the new role for this employee.',
+    },
+    ])
+    .then((answer) => {
+
+        // Create query as a string that includes new employee information.
+        thisQuery = 'INSERT INTO employee (role_id, manager_id) VALUES (' + answer.newRole + ', ' + answer.updatedRole + ')';
 
         console.log(thisQuery);
 
@@ -208,7 +233,6 @@ const addEmp = () => {
             }
          });
     });
-
 }
 
 const mainMenu = () => {
