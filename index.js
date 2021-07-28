@@ -87,6 +87,79 @@ const viewEmps = () => {
      });
 }
 
+const addDept = () => {
+
+    inquirer
+    .prompt([
+    {
+        type: 'input',
+        name: 'newDept',
+        prefix: '-',
+        message: 'Enter the name of the new department.',
+    },
+    ])
+    .then((answer) => {
+
+        // Create query as a string that includes new department.
+        thisQuery = 'INSERT INTO department (name) VALUES ("' + answer.newDept + '")';
+
+        // Add department to table.
+        db.query(thisQuery, (err, results) => {
+            if (err) {
+                console.log(err);
+                db.end();
+            } else {
+                //Display all departments.
+                viewDepts();
+            }
+         });
+    });
+
+}
+const addRole = () => {
+
+    inquirer
+    .prompt([
+    {
+        type: 'input',
+        name: 'newRole',
+        prefix: '-',
+        message: 'Enter the name of the new job role.',
+    },
+    {
+        type: 'number',
+        name: 'newSalary',
+        prefix: '-',
+        message: 'Enter the salary of the new job role.',
+    },
+    {
+        type: 'input',
+        name: 'newDept',
+        prefix: '-',
+        message: 'Enter the department of the new job role.',
+    },
+    ])
+    .then((answer) => {
+
+        // Create query as a string that includes new role information.
+        thisQuery = 'INSERT INTO role (title, salary, department_id) VALUES ("' + answer.newRole + '", ' + answer.newSalary + ', ' + answer.newDept + ')';
+
+        console.log(thisQuery);
+
+        // Add role to table.
+        db.query(thisQuery, (err, results) => {
+            if (err) {
+                console.log(err);
+                db.end();
+            } else {
+                //Display all roles.
+                viewRoles();
+            }
+         });
+    });
+
+}
+
 const mainMenu = () => {
 
     console.log('\n');
@@ -124,6 +197,9 @@ const mainMenu = () => {
 
             // Add an employee.
             else if (choice == 6) addEmp();
+
+            // Update an employee role.
+            else if (choice == 7) updateEmp();
 
             else db.end();
 
