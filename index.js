@@ -116,6 +116,7 @@ const addDept = () => {
     });
 
 }
+
 const addRole = () => {
 
     inquirer
@@ -154,6 +155,56 @@ const addRole = () => {
             } else {
                 //Display all roles.
                 viewRoles();
+            }
+         });
+    });
+
+}
+
+const addEmp = () => {
+
+    inquirer
+    .prompt([
+    {
+        type: 'input',
+        name: 'newFirst',
+        prefix: '-',
+        message: 'Enter the first name of the new employeee.',
+    },
+    {
+        type: 'input',
+        name: 'newLast',
+        prefix: '-',
+        message: 'Enter the last name of the new employee.',
+    },
+    {
+        type: 'number',
+        name: 'newRole',
+        prefix: '-',
+        message: 'Enter the role of the new employee.',
+    },
+    {
+        type: 'number',
+        name: 'newMgr',
+        prefix: '-',
+        message: 'Enter the manager ID number of the new employee.',
+    },
+    ])
+    .then((answer) => {
+
+        // Create query as a string that includes new role information.
+        thisQuery = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("' + answer.newFirst + '", "' + answer.newLast + '", ' + answer.newRole + ', ' + answer.newMgr + ')';
+
+        console.log(thisQuery);
+
+        // Add role to table.
+        db.query(thisQuery, (err, results) => {
+            if (err) {
+                console.log(err);
+                db.end();
+            } else {
+                //Display all roles.
+                viewEmps();
             }
          });
     });
