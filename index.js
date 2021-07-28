@@ -1,26 +1,26 @@
 // The app requires these packages to be installed.
-const express = require('express');
+// const express = require('express');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-const path = require('path');
+// const path = require('path');
 const { restoreDefaultPrompts } = require('inquirer');
 let choice;
 
 // Set up express.
-const PORT = process.env.PORT || 3001;
-const app = express();
+// const PORT = process.env.PORT || 3001;
+// const app = express();
 
 // app.listen(PORT, () =>
 //     console.log(`\n----- Listening at http://localhost:${PORT}`)
 // );
 
 // Express middleware
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
 
 // Parse request body as JSON.
-app.use(express.json());
-app.use(express.static('public'));
+// app.use(express.json());
+// app.use(express.static('public'));
 
 // Connect to database
 const db = mysql.createConnection(
@@ -39,19 +39,7 @@ const db = mysql.createConnection(
     console.log(`\n----- Now connected to the staff_db database. -----`)
 );
   
-app.get('/', (req, res) => res.send('Main'));
-
-// app.get('/', (req, res) => {
-
-//     // res.json(`${req.method} request received in /api/movies.`);
-//     console.log('----- GET request in /.');
-  
-//     res.send('movie data');
-  
-//     // db.query('SELECT * FROM employee;', function (err, results) {
-//     //   console.log(results);
-//     //   res.json(results);
-// });
+// app.get('/', (req, res) => res.send('Main'));
   
 function init() {
 
@@ -61,6 +49,42 @@ function init() {
     // Call main menu function.
     mainMenu();
 
+}
+
+const viewDepts = () => {
+    db.query('SELECT id AS ID, name AS Department FROM department', (err, results) => {
+        if (err) {
+            console.log(err);
+            db.end();
+        } else {
+            console.table(results);
+            keepGoing();
+        }
+     });
+}
+
+const viewRoles = () => {
+    db.query('SELECT role.title AS Title, role.id AS ID, department.name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id', (err, results) => {
+        if (err) {
+            console.log(err);
+            db.end();
+        } else {
+            console.table(results);
+            keepGoing();
+        }
+     });
+}
+
+const viewEmps = () => {
+    db.query('SELECT employee.id AS ID, employee.first_name AS FirstName, employee.last_name AS LastName, role.title AS Title, department.name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id', (err, results) => {
+        if (err) {
+            console.log(err);
+            db.end();
+        } else {
+            console.table(results);
+            keepGoing();
+        }
+     });
 }
 
 const mainMenu = () => {
@@ -80,39 +104,32 @@ const mainMenu = () => {
         ])
         .then((answers) => {
 
-            choice = answers.task[0];
             console.log('\n');
+            choice = answers.task[0];
 
-            // View All Departments.
-            if (choice == 1) {
-                db.query('SELECT id AS ID, name AS Department FROM department', function (err, results) {
-                   // console.log(results);
-                   console.table(results);
-                   keepGoing();
-                });
-            };
+            // View all departments.
+            if (choice == 1) viewDepts();
 
-            // View All Roles.
-            if (choice == 2) {
-                db.query('SELECT role.title AS Title, role.id AS ID, department.name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id', function (err, results) {
-                   // console.log(results);
-                   console.table(results);
-                   keepGoing();
-                });
-            };
+            // View all roles.
+            else if (choice == 2) viewRoles();
 
-            // View All Employees.
-            if (choice == 3) {
-                db.query('SELECT employee.id AS ID, employee.first_name AS FirstName, employee.last_name AS LastName, role.title AS Title, department.name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id', function (err, results) {
-                   // console.log(results);
-                   console.table(results);
-                   keepGoing();
-                });
-            };
+            // View all employees.
+            else if (choice == 3) viewEmps();
+
+            // Add a department.
+            else if (choice == 4) addDept();
+
+            // Add a role.
+            else if (choice == 5) addRole();
+
+            // Add an employee.
+            else if (choice == 6) addEmp();
+
+            else db.end();
 
         });
 
-    return;
+    // keepGoing();
     
 };
 
@@ -129,7 +146,11 @@ function keepGoing() {
         ])
         .then((answer) => {
             if (answer.goAgain) mainMenu();
-            else console.log('\n----- Thanks for using Employee Tracker. Goodbye!');
+            else {
+                console.log('\n----- Thanks for using Employee Tracker. Goodbye!');
+                console.log('\n');
+                db.end();
+            }
         });
 
 }
